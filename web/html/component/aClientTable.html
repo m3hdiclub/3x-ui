@@ -2,21 +2,21 @@
 <template slot="actions" slot-scope="text, client, index">
   <a-tooltip>
     <template slot="title">{{ i18n "qrCode" }}</template>
-    <a-icon :style="{ fontSize: '24px' }" class="normal-icon" type="qrcode" v-if="record.hasLink()" @click="showQrcode(record.id,client);"></a-icon>
+    <a-icon :style="{ fontSize: '22px', marginInlineStart: '14px' }" class="normal-icon" type="qrcode" v-if="record.hasLink()" @click="showQrcode(record.id,client);"></a-icon>
   </a-tooltip>
   <a-tooltip>
     <template slot="title">{{ i18n "pages.client.edit" }}</template>
-    <a-icon :style="{ fontSize: '24px' }" class="normal-icon" type="edit" @click="openEditClient(record.id,client);"></a-icon>
+    <a-icon :style="{ fontSize: '22px' }" class="normal-icon" type="edit" @click="openEditClient(record.id,client);"></a-icon>
   </a-tooltip>
   <a-tooltip>
     <template slot="title">{{ i18n "info" }}</template>
-    <a-icon :style="{ fontSize: '24px' }" class="normal-icon" type="info-circle" @click="showInfo(record.id,client);"></a-icon>
+    <a-icon :style="{ fontSize: '22px' }" class="normal-icon" type="info-circle" @click="showInfo(record.id,client);"></a-icon>
   </a-tooltip>
   <a-tooltip>
     <template slot="title">{{ i18n "pages.inbounds.resetTraffic" }}</template>
     <a-popconfirm @confirm="resetClientTraffic(client,record.id,false)" title='{{ i18n "pages.inbounds.resetTrafficContent"}}' :overlay-class-name="themeSwitcher.currentTheme" ok-text='{{ i18n "reset"}}' cancel-text='{{ i18n "cancel"}}'>
       <a-icon slot="icon" type="question-circle-o" :style="{ color: 'var(--color-primary-100)'}"></a-icon>
-      <a-icon :style="{ fontSize: '24px', cursor: 'pointer' }" class="normal-icon" type="retweet" v-if="client.email.length > 0"></a-icon>
+      <a-icon :style="{ fontSize: '22px', cursor: 'pointer' }" class="normal-icon" type="retweet" v-if="client.email.length > 0"></a-icon>
     </a-popconfirm>
   </a-tooltip>
   <a-tooltip>
@@ -25,7 +25,7 @@
     </template>
     <a-popconfirm @confirm="delClient(record.id,client,false)" title='{{ i18n "pages.inbounds.deleteClientContent"}}' :overlay-class-name="themeSwitcher.currentTheme" ok-text='{{ i18n "delete"}}' ok-type="danger" cancel-text='{{ i18n "cancel"}}'>
       <a-icon slot="icon" type="question-circle-o" :style="{ color: '#e04141' }"></a-icon>
-      <a-icon :style="{ fontSize: '24px', cursor: 'pointer' }" class="delete-icon" type="delete" v-if="isRemovable(record.id)"></a-icon>
+      <a-icon :style="{ fontSize: '22px', cursor: 'pointer' }" class="delete-icon" type="delete" v-if="isRemovable(record.id)"></a-icon>
     </a-popconfirm>
   </a-tooltip>
 </template>
@@ -33,22 +33,41 @@
   <a-switch v-model="client.enable" @change="switchEnableClient(record.id,client)"></a-switch>
 </template>
 <template slot="online" slot-scope="text, client, index">
-  <template v-if="client.enable && isClientOnline(client.email)">
-    <a-tag color="green">{{ i18n "online" }}</a-tag>
-  </template>
-  <template v-else>
-    <a-tag>{{ i18n "offline" }}</a-tag>
-  </template>
+  <a-popover :overlay-class-name="themeSwitcher.currentTheme">
+    <template slot="content" >
+      {{ i18n "lastOnline" }}: [[ formatLastOnline(client.email) ]]
+    </template>
+    <template v-if="client.enable && isClientOnline(client.email)">
+      <a-tag color="green">{{ i18n "online" }}</a-tag>
+    </template>
+    <template v-else>
+      <a-tag>{{ i18n "offline" }}</a-tag>
+    </template>
+  </a-popover>
 </template>
 <template slot="client" slot-scope="text, client">
-  <a-tooltip>
-    <template slot="title">
-      <template v-if="!isClientEnabled(record, client.email)">{{ i18n "depleted" }}</template>
-      <template v-else-if="!client.enable">{{ i18n "disabled" }}</template>
-      <template v-else-if="client.enable && isClientOnline(client.email)">{{ i18n "online" }}</template>
-    </template>
-    <a-badge :class="isClientOnline(client.email)? 'online-animation' : ''" :color="client.enable ? statsExpColor(record, client.email) : themeSwitcher.isDarkTheme ? '#2c3950' : '#bcbcbc'"></a-badge>
-  </a-tooltip> [[ client.email ]]
+  <a-space direction="horizontal" :size="2">
+    <a-tooltip>
+      <template slot="title">
+        <template v-if="isClientDepleted(record, client.email)">{{ i18n "depleted" }}</template>
+        <template v-else-if="!client.enable">{{ i18n "disabled" }}</template>
+        <template v-else-if="client.enable && isClientOnline(client.email)">{{ i18n "online" }}</template>
+      </template>
+      <a-badge :class="isClientOnline(client.email)? 'online-animation' : ''" :color="client.enable ? statsExpColor(record, client.email) : themeSwitcher.isDarkTheme ? '#2c3950' : '#bcbcbc'"></a-badge>
+    </a-tooltip>
+    <a-space direction="vertical" :size="2">
+      <span class="client-email">[[ client.email ]]</span>
+      <template v-if="client.comment && client.comment.trim()">
+        <a-tooltip v-if="client.comment.length > 50" :overlay-class-name="themeSwitcher.currentTheme">
+          <template slot="title">
+            [[ client.comment ]]
+          </template>
+          <span class="client-comment">[[ client.comment.substring(0, 47) + '...' ]]</span>
+        </a-tooltip>
+        <span v-else class="client-comment">[[ client.comment ]]</span>
+      </template>
+    </a-space>
+  </a-space>
 </template>
 <template slot="traffic" slot-scope="text, client">
   <a-popover :overlay-class-name="themeSwitcher.currentTheme">
@@ -71,7 +90,7 @@
           <a-progress :stroke-color="themeSwitcher.isDarkTheme ? 'rgb(72 84 105)' : '#bcbcbc'" :show-info="false" :percent="statsProgress(record, client.email)" />
         </td>
         <td class="tr-table-bar" v-else-if="client.totalGB > 0">
-          <a-progress :stroke-color="clientStatsColor(record, client.email)" :show-info="false" :status="isClientEnabled(record, client.email)? 'exception' : ''" :percent="statsProgress(record, client.email)" />
+          <a-progress :stroke-color="clientStatsColor(record, client.email)" :show-info="false" :status="isClientDepleted(record, client.email)? 'exception' : ''" :percent="statsProgress(record, client.email)" />
         </td>
         <td v-else class="infinite-bar tr-table-bar">
           <a-progress :show-info="false" :percent="100"></a-progress>
@@ -84,26 +103,22 @@
     </table>
   </a-popover>
 </template>
+
+<template slot="allTime" slot-scope="text, client">
+  <a-tag>[[ SizeFormatter.sizeFormat(getAllTimeClient(record, client.email)) ]]</a-tag>
+</template>
 <template slot="expiryTime" slot-scope="text, client, index">
   <template v-if="client.expiryTime !=0 && client.reset >0">
     <a-popover :overlay-class-name="themeSwitcher.currentTheme">
       <template slot="content">
-        <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}
-        </span>
-        <span v-else>
-          <template v-if="app.datepicker === 'gregorian'">
-            [[ DateUtil.formatMillis(client._expiryTime) ]]
-          </template>
-          <template v-else>
-            [[ DateUtil.convertToJalalian(moment(client._expiryTime)) ]]
-          </template>
-        </span>
+        <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}</span>
+        <span v-else>[[ IntlUtil.formatDate(client.expiryTime) ]]</span>
       </template>
       <table>
         <tr class="tr-table-box">
-          <td class="tr-table-rt"> [[ remainedDays(client.expiryTime) ]] </td>
+          <td class="tr-table-rt"> [[ IntlUtil.formatRelativeTime(client.expiryTime) ]] </td>
           <td class="infinite-bar tr-table-bar">
-            <a-progress :show-info="false" :status="isClientEnabled(record, client.email)? 'exception' : ''" :percent="expireProgress(client.expiryTime, client.reset)" />
+            <a-progress :show-info="false" :status="isClientDepleted(record, client.email)? 'exception' : ''" :percent="expireProgress(client.expiryTime, client.reset)" />
           </td>
           <td class="tr-table-lt">[[ client.reset + "d" ]]</td>
         </tr>
@@ -113,18 +128,10 @@
   <template v-else>
     <a-popover v-if="client.expiryTime != 0" :overlay-class-name="themeSwitcher.currentTheme">
       <template slot="content">
-        <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}
-        </span>
-        <span v-else>
-          <template v-if="app.datepicker === 'gregorian'">
-            [[ DateUtil.formatMillis(client._expiryTime) ]]
-          </template>
-          <template v-else>
-            [[ DateUtil.convertToJalalian(moment(client._expiryTime)) ]]
-          </template>
-        </span>
+        <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}</span>
+        <span v-else>[[ IntlUtil.formatDate(client.expiryTime) ]]</span>
       </template>
-      <a-tag :style="{ minWidth: '50px', border: 'none' }" :color="ColorUtils.userExpiryColor(app.expireDiff, client, themeSwitcher.isDarkTheme)"> [[ remainedDays(client.expiryTime) ]] </a-tag>
+      <a-tag :style="{ minWidth: '50px', border: 'none' }" :color="ColorUtils.userExpiryColor(app.expireDiff, client, themeSwitcher.isDarkTheme)"> [[ IntlUtil.formatRelativeTime(client.expiryTime) ]] </a-tag>
     </a-popover>
     <a-tag v-else :color="ColorUtils.userExpiryColor(app.expireDiff, client, themeSwitcher.isDarkTheme)" :style="{ border: 'none' }" class="infinite-tag">
       <svg height="10px" width="14px" viewBox="0 0 640 512" fill="currentColor">
@@ -190,7 +197,7 @@
                   </tr>
                 </table>
               </template>
-              <a-progress :stroke-color="clientStatsColor(record, client.email)" :show-info="false" :status="isClientEnabled(record, client.email)? 'exception' : ''" :percent="statsProgress(record, client.email)" />
+              <a-progress :stroke-color="clientStatsColor(record, client.email)" :show-info="false" :status="isClientDepleted(record, client.email)? 'exception' : ''" :percent="statsProgress(record, client.email)" />
             </a-popover>
           </td>
           <td width="120px" v-else class="infinite-bar">
@@ -209,22 +216,14 @@
         </tr>
         <tr>
           <template v-if="client.expiryTime !=0 && client.reset >0">
-            <td width="80px" :style="{ margin: '0', textAlign: 'right', fontSize: '1em' }"> [[ remainedDays(client.expiryTime) ]] </td>
+            <td width="80px" :style="{ margin: '0', textAlign: 'right', fontSize: '1em' }"> [[ IntlUtil.formatRelativeTime(client.expiryTime) ]] </td>
             <td width="120px" class="infinite-bar">
               <a-popover :overlay-class-name="themeSwitcher.currentTheme">
                 <template slot="content">
-                  <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}
-                  </span>
-                  <span v-else>
-                    <template v-if="app.datepicker === 'gregorian'">
-                      [[ DateUtil.formatMillis(client._expiryTime) ]]
-                    </template>
-                    <template v-else>
-                      [[ DateUtil.convertToJalalian(moment(client._expiryTime)) ]]
-                    </template>
-                  </span>
+                  <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}</span>
+                  <span v-else>[[ IntlUtil.formatDate(client.expiryTime) ]]</span>
                 </template>
-                <a-progress :show-info="false" :status="isClientEnabled(record, client.email)? 'exception' : ''" :percent="expireProgress(client.expiryTime, client.reset)" />
+                <a-progress :show-info="false" :status="isClientDepleted(record, client.email)? 'exception' : ''" :percent="expireProgress(client.expiryTime, client.reset)" />
               </a-popover>
             </td>
             <td width="60px">[[ client.reset + "d" ]]</td>
@@ -233,18 +232,10 @@
             <td colspan="3" :style="{ textAlign: 'center' }">
               <a-popover v-if="client.expiryTime != 0" :overlay-class-name="themeSwitcher.currentTheme">
                 <template slot="content">
-                  <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}
-                  </span>
-                  <span v-else>
-                    <template v-if="app.datepicker === 'gregorian'">
-                      [[ DateUtil.formatMillis(client._expiryTime) ]]
-                    </template>
-                    <template v-else>
-                      [[ DateUtil.convertToJalalian(moment(client._expiryTime)) ]]
-                    </template>
-                  </span>
+                  <span v-if="client.expiryTime < 0">{{ i18n "pages.client.delayedStart" }}</span>
+                  <span v-else>[[ IntlUtil.formatDate(client.expiryTime) ]]</span>
                 </template>
-                <a-tag :style="{ minWidth: '50px', border: 'none' }" :color="ColorUtils.userExpiryColor(app.expireDiff, client, themeSwitcher.isDarkTheme)"> [[ remainedDays(client.expiryTime) ]] </a-tag>
+                <a-tag :style="{ minWidth: '50px', border: 'none' }" :color="ColorUtils.userExpiryColor(app.expireDiff, client, themeSwitcher.isDarkTheme)"> [[ IntlUtil.formatRelativeTime(client.expiryTime) ]] </a-tag>
               </a-popover>
               <a-tag v-else :color="client.enable ? 'purple' : themeSwitcher.isDarkTheme ? '#2c3950' : '#bcbcbc'" class="infinite-tag">
                 <svg height="10px" width="14px" viewBox="0 0 640 512" fill="currentColor">
@@ -263,5 +254,21 @@
       </a-button>
     </a-badge>
   </a-popover>
+</template>
+<template slot="createdAt" slot-scope="text, client, index">
+  <template v-if="client.created_at">
+    [[ IntlUtil.formatDate(client.created_at) ]]
+  </template>
+  <template v-else>
+    -
+  </template>
+</template>
+<template slot="updatedAt" slot-scope="text, client, index">
+  <template v-if="client.updated_at">
+    [[ IntlUtil.formatDate(client.updated_at) ]]
+  </template>
+  <template v-else>
+    -
+  </template>
 </template>
 {{end}}

@@ -138,8 +138,14 @@ class RandomUtil {
         }
     }
 
-    static randomShadowsocksPassword() {
-        const array = new Uint8Array(32);
+    static randomShadowsocksPassword(method = SSMethods.BLAKE3_AES_256_GCM) {
+        let length = 32;
+
+        if ([SSMethods.BLAKE3_AES_128_GCM].includes(method)) {
+            length = 16; 
+        }
+
+        const array = new Uint8Array(length);
 
         window.crypto.getRandomValues(array);
 
@@ -310,15 +316,13 @@ class ObjectUtil {
     }
 
     static equals(a, b) {
-        for (const key in a) {
-            if (!a.hasOwnProperty(key)) {
-                continue;
-            }
-            if (!b.hasOwnProperty(key)) {
-                return false;
-            } else if (a[key] !== b[key]) {
-                return false;
-            }
+        // shallow, symmetric comparison so newly added fields also affect equality
+        const aKeys = Object.keys(a);
+        const bKeys = Object.keys(b);
+        if (aKeys.length !== bKeys.length) return false;
+        for (const key of aKeys) {
+            if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+            if (a[key] !== b[key]) return false;
         }
         return true;
     }
@@ -789,6 +793,25 @@ class LanguageManager {
             if (window.navigator) {
                 lang = window.navigator.language || window.navigator.userLanguage;
 
+                const simularLangs = [
+                    ["ar", this.supportedLanguages[0].value],
+                    ["fa", this.supportedLanguages[2].value],
+                    ["ja", this.supportedLanguages[5].value],
+                    ["ru", this.supportedLanguages[6].value],
+                    ["vi", this.supportedLanguages[7].value],
+                    ["es", this.supportedLanguages[8].value],
+                    ["id", this.supportedLanguages[9].value],
+                    ["uk", this.supportedLanguages[10].value],
+                    ["tr", this.supportedLanguages[11].value],
+                    ["pt", this.supportedLanguages[12].value],
+                ]
+
+                simularLangs.forEach((pair) => {
+                    if (lang === pair[0]) {
+                        lang = pair[1];
+                    }
+                });
+
                 if (LanguageManager.isSupportLanguage(lang)) {
                     CookieManager.setCookie("lang", lang, 150);
                 } else {
@@ -858,5 +881,36 @@ class FileManager {
         URL.revokeObjectURL(link.href);
 
         link.remove();
+    }
+}
+
+class IntlUtil {
+    static formatDate(date) {
+        const language = LanguageManager.getLanguage()
+
+        let intlOptions = {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric"
+        }
+
+        const intl = new Intl.DateTimeFormat(
+            language,
+            intlOptions
+        )
+
+        return intl.format(new Date(date))
+    }
+    static formatRelativeTime(date) {
+        const language = LanguageManager.getLanguage()
+        const now = new Date()
+
+        const diff = Math.round((date - now) / (1000 * 60 * 60 * 24))
+        const formatter = new Intl.RelativeTimeFormat(language, { numeric: 'auto' })
+
+        return formatter.format(diff, 'day');
     }
 }

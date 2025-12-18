@@ -50,6 +50,7 @@
 "fail" = "Başarısız"
 "comment" = "Yorum"
 "success" = "Başarılı"
+"lastOnline" = "Son çevrimiçi"
 "getVersion" = "Sürümü Al"
 "install" = "Yükle"
 "clients" = "Müşteriler"
@@ -71,6 +72,20 @@
 "emptyReverseDesc" = "Eklenmiş ters proxy yok."
 "somethingWentWrong" = "Bir şeyler yanlış gitti"
 
+[subscription]
+"title" = "Abonelik Bilgisi"
+"subId" = "Abonelik Kimliği"
+"status" = "Durum"
+"downloaded" = "İndirilen"
+"uploaded" = "Yüklenen"
+"expiry" = "Son Kullanma"
+"totalQuota" = "Toplam Kota"
+"individualLinks" = "Bireysel Bağlantılar"
+"active" = "Aktif"
+"inactive" = "Pasif"
+"unlimited" = "Sınırsız"
+"noExpiry" = "Süresiz"
+
 [menu]
 "theme" = "Tema"
 "dark" = "Koyu"
@@ -91,7 +106,7 @@
 "invalidFormData" = "Girdi verisi formatı geçersiz."
 "emptyUsername" = "Kullanıcı adı gerekli"
 "emptyPassword" = "Şifre gerekli"
-"wrongUsernameOrPassword" = "Geçersiz kullanıcı adı, şifre veya iki adımlı doğrulama kodu."  
+"wrongUsernameOrPassword" = "Geçersiz kullanıcı adı, şifre veya iki adımlı doğrulama kodu."
 "successLogin" = "Hesabınıza başarıyla giriş yaptınız."
 
 [pages.index]
@@ -117,8 +132,6 @@
 "operationHours" = "Çalışma Süresi"
 "systemLoad" = "Sistem Yükü"
 "systemLoadDesc" = "Geçmiş 1, 5 ve 15 dakika için sistem yük ortalaması"
-"connectionTcpCountDesc" = "Sistem genelinde toplam TCP bağlantıları"
-"connectionUdpCountDesc" = "Sistem genelinde toplam UDP bağlantıları"
 "connectionCount" = "Bağlantı İstatistikleri"
 "ipAddresses" = "IP adresleri"
 "toggleIpVisibility" = "IP görünürlüğünü değiştir"
@@ -128,11 +141,14 @@
 "totalData" = "Toplam veri"
 "sent" = "Gönderilen"
 "received" = "Alınan"
+"documentation" = "Dokümantasyon"
 "xraySwitchVersionDialog" = "Xray sürümünü gerçekten değiştirmek istiyor musunuz?"
 "xraySwitchVersionDialogDesc" = "Bu işlem Xray sürümünü #version# olarak değiştirecektir."
 "xraySwitchVersionPopover" = "Xray başarıyla güncellendi"
 "geofileUpdateDialog" = "Geofile'ı gerçekten güncellemek istiyor musunuz?"
 "geofileUpdateDialogDesc" = "Bu işlem #filename# dosyasını güncelleyecektir."
+"geofilesUpdateDialogDesc" = "Bu, tüm dosyaları güncelleyecektir."
+"geofilesUpdateAll" = "Tümünü güncelle"
 "geofileUpdatePopover" = "Geofile başarıyla güncellendi"
 "dontRefresh" = "Kurulum devam ediyor, lütfen bu sayfayı yenilemeyin"
 "logs" = "Günlükler"
@@ -150,6 +166,8 @@
 "getConfigError" = "Yapılandırma dosyası alınırken bir hata oluştu"
 
 [pages.inbounds]
+"allTimeTraffic" = "Toplam Trafik"
+"allTimeTrafficUsage" = "Tüm Zamanların Toplam Kullanımı"
 "title" = "Gelenler"
 "totalDownUp" = "Toplam Gönderilen/Alınan"
 "totalUsage" = "Toplam Kullanım"
@@ -159,10 +177,13 @@
 "remark" = "Açıklama"
 "protocol" = "Protokol"
 "port" = "Port"
+"portMap" = "Port Atama"
 "traffic" = "Trafik"
 "details" = "Detaylar"
 "transportConfig" = "Taşıma"
 "expireDate" = "Süre"
+"createdAt" = "Oluşturuldu"
+"updatedAt" = "Güncellendi"
 "resetTraffic" = "Trafiği Sıfırla"
 "addInbound" = "Gelen Ekle"
 "generalActions" = "Genel Eylemler"
@@ -174,8 +195,6 @@
 "deleteClient" = "Müşteriyi Sil"
 "deleteClientContent" = "Müşteriyi silmek istediğinizden emin misiniz?"
 "resetTrafficContent" = "Trafiği sıfırlamak istediğinizden emin misiniz?"
-"inboundUpdateSuccess" = "Gelen bağlantı başarıyla güncellendi."
-"inboundCreateSuccess" = "Gelen bağlantı başarıyla oluşturuldu."
 "copyLink" = "URL'yi Kopyala"
 "address" = "Adres"
 "network" = "Ağ"
@@ -225,6 +244,9 @@
 "exportInbound" = "Geleni Dışa Aktar"
 "import" = "İçe Aktar"
 "importInbound" = "Bir Gelen İçe Aktar"
+"periodicTrafficResetTitle" = "Trafik Sıfırlama"
+"periodicTrafficResetDesc" = "Belirtilen aralıklarla trafik sayacını otomatik olarak sıfırla"
+"lastReset" = "Son Sıfırlama"
 
 [pages.client]
 "add" = "Müşteri Ekle"
@@ -244,6 +266,12 @@
 "renew" = "Otomatik Yenile"
 "renewDesc" = "Süresi dolduktan sonra otomatik yenileme. (0 = devre dışı)(birim: gün)"
 
+[pages.inbounds.periodicTrafficReset]
+"never" = "Asla"
+"daily" = "Günlük"
+"weekly" = "Haftalık"
+"monthly" = "Aylık"
+
 [pages.inbounds.toasts]
 "obtain" = "Elde Et"
 "updateSuccess" = "Güncelleme başarılı oldu"
@@ -261,6 +289,8 @@
 "resetInboundClientTrafficSuccess" = "Trafik sıfırlandı"
 "trafficGetError" = "Trafik bilgisi alınırken hata oluştu"
 "getNewX25519CertError" = "X25519 sertifikası alınırken hata oluştu."
+"getNewmldsa65Error" = "mldsa65 sertifikası alınırken hata oluştu."
+"getNewVlessEncError" = "VlessEnc sertifikası alınırken hata oluştu."
 
 [pages.inbounds.stream.general]
 "request" = "İstek"
@@ -341,6 +371,7 @@
 "subSettings" = "Abonelik"
 "subEnable" = "Abonelik Hizmetini Etkinleştir"
 "subEnableDesc" = "Abonelik hizmetini etkinleştirir."
+"subJsonEnable" = "JSON abonelik uç noktasını bağımsız olarak Etkinleştir/Devre Dışı bırak."
 "subTitle" = "Abonelik Başlığı"
 "subTitleDesc" = "VPN istemcisinde gösterilen başlık"
 "subListen" = "Dinleme IP"
@@ -401,7 +432,6 @@
 "generalConfigsDesc" = "Bu seçenekler genel ayarlamaları belirler."
 "logConfigs" = "Günlük"
 "logConfigsDesc" = "Günlükler sunucunuzun verimliliğini etkileyebilir. Yalnızca ihtiyaç durumunda akıllıca etkinleştirmeniz önerilir"
-"blockConfigs" = "Koruma Kalkanı"
 "blockConfigsDesc" = "Bu seçenekler belirli istek protokolleri ve web siteleri temelinde trafiği engeller."
 "basicRouting" = "Temel Yönlendirme"
 "blockConnectionsConfigsDesc" = "Bu seçenekler belirli bir istenen ülkeye göre trafiği engelleyecektir."
@@ -421,9 +451,6 @@
 "RoutingStrategy" = "Genel Yönlendirme Stratejisi"
 "RoutingStrategyDesc" = "Tüm istekleri çözmek için genel trafik yönlendirme stratejisini ayarlayın."
 "Torrent" = "BitTorrent Protokolünü Engelle"
-"TorrentDesc" = "BitTorrent protokolünü engeller."
-"Family" = "Aile Koruması"
-"FamilyDesc" = "Yetişkin içerikli ve kötü amaçlı yazılım web sitelerini engeller."
 "Inbounds" = "Gelenler"
 "InboundsDesc" = "Belirli müşterileri kabul eder."
 "Outbounds" = "Gidenler"
@@ -523,6 +550,12 @@
 "edit" = "Sunucuyu Düzenle"
 "domains" = "Alan Adları"
 "expectIPs" = "Beklenen IP'ler"
+"unexpectIPs" = "Beklenmeyen IP'ler"
+"useSystemHosts" = "Sistem Hosts'larını Kullan"
+"useSystemHostsDesc" = "Yüklü bir sistemden hosts dosyasını kullan"
+"usePreset" = "Şablon kullan"
+"dnsPresetTitle" = "DNS Şablonları"
+"dnsPresetFamily" = "Aile"
 
 [pages.xray.fakedns]
 "add" = "Sahte DNS Ekle"
@@ -532,15 +565,17 @@
 
 [pages.settings.security]
 "admin" = "Yönetici kimlik bilgileri"
-"twoFactor" = "İki adımlı doğrulama"  
-"twoFactorEnable" = "2FA'yı Etkinleştir"  
-"twoFactorEnableDesc" = "Daha fazla güvenlik için ek bir doğrulama katmanı ekler."  
+"twoFactor" = "İki adımlı doğrulama"
+"twoFactorEnable" = "2FA'yı Etkinleştir"
+"twoFactorEnableDesc" = "Daha fazla güvenlik için ek bir doğrulama katmanı ekler."
 "twoFactorModalSetTitle" = "İki adımlı doğrulamayı etkinleştir"
 "twoFactorModalDeleteTitle" = "İki adımlı doğrulamayı devre dışı bırak"
 "twoFactorModalSteps" = "İki adımlı doğrulamayı ayarlamak için şu adımları izleyin:"
 "twoFactorModalFirstStep" = "1. Bu QR kodunu doğrulama uygulamasında tarayın veya QR kodunun yanındaki token'ı kopyalayıp uygulamaya yapıştırın"
 "twoFactorModalSecondStep" = "2. Uygulamadaki kodu girin"
 "twoFactorModalRemoveStep" = "İki adımlı doğrulamayı kaldırmak için uygulamadaki kodu girin."
+"twoFactorModalChangeCredentialsTitle" = "Kimlik bilgilerini değiştir"
+"twoFactorModalChangeCredentialsStep" = "Yönetici kimlik bilgilerini değiştirmek için uygulamadaki kodu girin."
 "twoFactorModalSetSuccess" = "İki faktörlü kimlik doğrulama başarıyla kuruldu"
 "twoFactorModalDeleteSuccess" = "İki faktörlü kimlik doğrulama başarıyla silindi"
 "twoFactorModalError" = "Yanlış kod"
@@ -556,22 +591,23 @@
 "resetOutboundTrafficError" = "Giden trafik sıfırlanırken hata"
 
 [tgbot]
-"keyboardClosed" = "❌ Özel klavye kapalı!"
+"keyboardClosed" = "❌ Klavye kapatıldı!"
 "noResult" = "❗ Sonuç yok!"
 "noQuery" = "❌ Sorgu bulunamadı! Lütfen komutu tekrar kullanın!"
 "wentWrong" = "❌ Bir şeyler yanlış gitti!"
-"noIpRecord" = "❗ IP Kaydı yok!"
-"noInbounds" = "❗ Gelen bulunamadı!"
-"unlimited" = "♾ Sınırsız(Sıfırla)"
+"noIpRecord" = "❗ IP Kaydı Yok!"
+"noInbounds" = "❗ Gelen bağlantı bulunamadı!"
+"unlimited" = "♾ Sınırsız (Sıfırla)"
 "add" = "Ekle"
 "month" = "Ay"
 "months" = "Aylar"
 "day" = "Gün"
 "days" = "Günler"
 "hours" = "Saatler"
-"unknown" = "Bilinmiyor"
+"minutes" = "Dakika"
+"unknown" = "Bilinmeyen"
 "inbounds" = "Gelenler"
-"clients" = "Müşteriler"
+"clients" = "İstemciler"
 "offline" = "🔴 Çevrimdışı"
 "online" = "🟢 Çevrimiçi"
 
@@ -590,6 +626,10 @@
 "restartSuccess" = "✅ İşlem başarılı!"
 "restartFailed" = "❗ İşlem hatası.\r\n\r\n<code>Hata: {{ .Error }}</code>."
 "xrayNotRunning" = "❗ Xray Core çalışmıyor."
+"startDesc" = "Ana menüyü göster"
+"helpDesc" = "Bot yardımı"
+"statusDesc" = "Bot durumunu kontrol et"
+"idDesc" = "Telegram ID'nizi göster"
 
 [tgbot.messages]
 "cpuThreshold" = "🔴 CPU Yükü {{ .Percent }}% eşiği {{ .Threshold }}%'yi aşıyor"
@@ -623,6 +663,7 @@
 "active" = "💡 Aktif: {{ .Enable }}\r\n"
 "enabled" = "🚨 Etkin: {{ .Enable }}\r\n"
 "online" = "🌐 Bağlantı durumu: {{ .Status }}\r\n"
+"lastOnline" = "🔙 Son çevrimiçi: {{ .Time }}\r\n"
 "email" = "📧 E-posta: {{ .Email }}\r\n"
 "upload" = "🔼 Yükleme: ↑{{ .Upload }}\r\n"
 "download" = "🔽 İndirme: ↓{{ .Download }}\r\n"
@@ -637,7 +678,6 @@
 "refreshedOn" = "\r\n📋🔄 Yenilendi: {{ .Time }}\r\n\r\n"
 "yes" = "✅ Evet"
 "no" = "❌ Hayır"
-
 "received_id" = "🔑📥 Kimlik güncellendi."
 "received_password" = "🔑📥 Şifre güncellendi."
 "received_email" = "📧📥 E-posta güncellendi."
@@ -649,14 +689,13 @@
 "inbound_client_data_id" = "🔄 Giriş: {{ .InboundRemark }}\n\n🔑 Kimlik: {{ .ClientId }}\n📧 E-posta: {{ .ClientEmail }}\n📊 Trafik: {{ .ClientTraffic }}\n📅 Bitiş Tarihi: {{ .ClientExp }}\n🌐 IP Sınırı: {{ .IpLimit }}\n💬 Yorum: {{ .ClientComment }}\n\nArtık bu müşteriyi girişe ekleyebilirsin!"
 "inbound_client_data_pass" = "🔄 Giriş: {{ .InboundRemark }}\n\n🔑 Şifre: {{ .ClientPass }}\n📧 E-posta: {{ .ClientEmail }}\n📊 Trafik: {{ .ClientTraffic }}\n📅 Bitiş Tarihi: {{ .ClientExp }}\n🌐 IP Sınırı: {{ .IpLimit }}\n💬 Yorum: {{ .ClientComment }}\n\nArtık bu müşteriyi girişe ekleyebilirsin!"
 "cancel" = "❌ İşlem iptal edildi! \n\nİstediğiniz zaman /start ile yeniden başlayabilirsiniz. 🔄"
-"error_add_client"  = "⚠️ Hata:\n\n {{ .error }}"
-"using_default_value"  = "Tamam, varsayılan değeri kullanacağım. 😊"
-"incorrect_input" ="Girdiğiniz değer geçerli değil.\nKelime öbekleri boşluk olmadan devam etmelidir.\nDoğru örnek: aaaaaa\nYanlış örnek: aaa aaa 🚫"
+"error_add_client" = "⚠️ Hata:\n\n {{ .error }}"
+"using_default_value" = "Tamam, varsayılan değeri kullanacağım. 😊"
+"incorrect_input" = "Girdiğiniz değer geçerli değil.\nKelime öbekleri boşluk olmadan devam etmelidir.\nDoğru örnek: aaaaaa\nYanlış örnek: aaa aaa 🚫"
 "AreYouSure" = "Emin misin? 🤔"
 "SuccessResetTraffic" = "📧 E-posta: {{ .ClientEmail }}\n🏁 Sonuç: ✅ Başarılı"
 "FailedResetTraffic" = "📧 E-posta: {{ .ClientEmail }}\n🏁 Sonuç: ❌ Başarısız \n\n🛠️ Hata: [ {{ .ErrorMessage }} ]"
 "FinishProcess" = "🔚 Tüm müşteriler için trafik sıfırlama işlemi tamamlandı."
-
 
 [tgbot.buttons]
 "closeKeyboard" = "❌ Klavyeyi Kapat"
@@ -691,7 +730,6 @@
 "limitTraffic" = "🚧 Trafik Sınırı"
 "getBanLogs" = "Yasak Günlüklerini Al"
 "allClients" = "Tüm Müşteriler"
-
 "addClient" = "Müşteri Ekle"
 "submitDisable" = "Devre Dışı Olarak Gönder ☑️"
 "submitEnable" = "Etkin Olarak Gönder ✅"
@@ -702,7 +740,6 @@
 "change_comment" = "⚙️💬 Yorum"
 "ResetAllTraffics" = "Tüm Trafikleri Sıfırla"
 "SortedTrafficUsageReport" = "Sıralı Trafik Kullanım Raporu"
-
 
 [tgbot.answers]
 "successfulOperation" = "✅ İşlem başarılı!"

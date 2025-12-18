@@ -101,9 +101,19 @@
       {{ i18n "security" }}
       <a-tag :color="inbound.stream.security == 'none' ? 'red' : 'green'">[[ inbound.stream.security ]]</a-tag>
       <br />
+      <td>Authentication</td>
+        <a-tag v-if="inbound.settings.selectedAuth" color="green">[[ inbound.settings.selectedAuth ? inbound.settings.selectedAuth : '' ]]</a-tag>
+        <a-tag v-else color="red">{{ i18n "none" }}</a-tag>
+      <br />
+      {{ i18n "encryption" }}
+        <a-tag class="info-large-tag" :color="inbound.settings.encryption ? 'green' : 'red'">[[ inbound.settings.encryption ? inbound.settings.encryption : '' ]]</a-tag>
+        <a-tooltip title='{{ i18n "copy" }}'>
+          <a-button size="small" icon="snippets" @click="copy(inbound.settings.encryption)"></a-button>
+        </a-tooltip>
+      <br />
       <template v-if="inbound.stream.security != 'none'">
         {{ i18n "domainName" }}
-        <a-tag v-if="inbound.serverName" :color="inbound.serverName ? 'green' : 'orange'">[[ inbound.serverName ? inbound.serverName : '' ]]</a-tag>
+        <a-tag v-if="inbound.serverName" color="green">[[ inbound.serverName ? inbound.serverName : '' ]]</a-tag>
         <a-tag v-else color="orange">{{ i18n "none" }}</a-tag>
       </template>
     </template>
@@ -173,9 +183,9 @@
         <tr>
           <td>{{ i18n "status" }}</td>
           <td>
-            <a-tag v-if="isEnable" color="green">{{ i18n "enabled" }}</a-tag>
+            <a-tag v-if="isDepleted" color="red">{{ i18n "depleted" }}</a-tag>
+            <a-tag v-else-if="isEnable" color="green">{{ i18n "enabled" }}</a-tag>
             <a-tag v-else>{{ i18n "disabled" }}</a-tag>
-            <a-tag v-if="!isActive" color="red">{{ i18n "depleted" }}</a-tag>
           </td>
         </tr>
         <tr v-if="infoModal.clientStats">
@@ -183,6 +193,34 @@
           <td>
             <a-tag color="green">[[ SizeFormatter.sizeFormat(infoModal.clientStats.up + infoModal.clientStats.down) ]]</a-tag>
             <a-tag>↑ [[ SizeFormatter.sizeFormat(infoModal.clientStats.up) ]] / [[ SizeFormatter.sizeFormat(infoModal.clientStats.down) ]] ↓</a-tag>
+          </td>
+        </tr>
+        <tr>
+          <td>{{ i18n "pages.inbounds.createdAt" }}</td>
+          <td>
+            <template v-if="infoModal.clientSettings && infoModal.clientSettings.created_at">
+              <a-tag>[[ IntlUtil.formatDate(infoModal.clientSettings.created_at) ]]</a-tag>
+            </template>
+            <template v-else>
+              <a-tag>-</a-tag>
+            </template>
+          </td>
+        </tr>
+        <tr>
+          <td>{{ i18n "pages.inbounds.updatedAt" }}</td>
+          <td>
+            <template v-if="infoModal.clientSettings && infoModal.clientSettings.updated_at">
+              <a-tag>[[ IntlUtil.formatDate(infoModal.clientSettings.updated_at) ]]</a-tag>
+            </template>
+            <template v-else>
+              <a-tag>-</a-tag>
+            </template>
+          </td>
+        </tr>
+        <tr>
+          <td>{{ i18n "lastOnline" }}</td>
+          <td>
+            <a-tag>[[ app.formatLastOnline(infoModal.clientSettings && infoModal.clientSettings.email ? infoModal.clientSettings.email : '') ]]</a-tag>
           </td>
         </tr>
         <tr v-if="infoModal.clientSettings.comment">
@@ -199,7 +237,7 @@
             <a-tag>[[ infoModal.clientSettings.limitIp ]]</a-tag>
           </td>
         </tr>
-        <tr v-if="app.ipLimitEnable">
+        <tr v-if="app.ipLimitEnable && infoModal.clientSettings.limitIp > 0">
           <td>{{ i18n "pages.inbounds.IPLimitlog" }}</td>
           <td>
             <a-tag>[[ infoModal.clientIps ]]</a-tag>
@@ -234,12 +272,7 @@
           <td>
             <template v-if="infoModal.clientSettings.expiryTime > 0">
               <a-tag :color="ColorUtils.usageColor(new Date().getTime(), app.expireDiff, infoModal.clientSettings.expiryTime)"> 
-                <template v-if="app.datepicker === 'gregorian'">
-                  [[ DateUtil.formatMillis(infoModal.clientSettings.expiryTime) ]]
-                </template>
-                <template v-else>
-                  [[ DateUtil.convertToJalalian(moment(infoModal.clientSettings.expiryTime)) ]]
-                </template>
+                [[ IntlUtil.formatDate(infoModal.clientSettings.expiryTime) ]]
               </a-tag>
             </template>
             <a-tag v-else-if="infoModal.clientSettings.expiryTime < 0" color="green">[[ infoModal.clientSettings.expiryTime / -86400000 ]] {{ i18n "pages.client.days" }}
@@ -263,7 +296,7 @@
           </tr-info-title>
           <a :href="[[ infoModal.subLink ]]" target="_blank">[[ infoModal.subLink ]]</a>
         </tr-info-row>
-        <tr-info-row class="tr-info-row">
+        <tr-info-row class="tr-info-row" v-if="app.subSettings.subJsonEnable">
           <tr-info-title class="tr-info-title">
             <a-tag color="purple">Json Link</a-tag>
             <a-tooltip title='{{ i18n "copy" }}'>
@@ -310,7 +343,7 @@
           <code>[[ link.link ]]</code>
         </tr-info-row>
       </template>
-      <table v-if="inbound.protocol == Protocols.DOKODEMO" class="tr-info-table">
+      <table v-if="inbound.protocol == Protocols.TUNNEL" class="tr-info-table">
         <tr>
           <th>{{ i18n "pages.inbounds.targetAddress" }}</th>
           <th>{{ i18n "pages.inbounds.destinationPort" }}</th>
@@ -332,7 +365,7 @@
           </td>
         </tr>
       </table>
-      <table v-if="dbInbound.isSocks" class="tr-info-table">
+      <table v-if="dbInbound.isMixed" class="tr-info-table">
         <tr>
           <th>{{ i18n "password" }} Auth</th>
           <th>{{ i18n "pages.inbounds.enable" }} udp</th>
@@ -433,6 +466,9 @@
                   <a-tooltip title='{{ i18n "copy" }}'>
                     <a-button :style="{ minWidth: '24px' }" size="small" icon="snippets" @click="copy(infoModal.links[index])"></a-button>
                   </a-tooltip>
+                  <a-tooltip title='{{ i18n "download" }}'>
+                    <a-button :style="{ minWidth: '24px' }" size="small" icon="download" @click="FileManager.downloadTextFile(infoModal.links[index], `peer-${index + 1}.conf`)"></a-button>
+                  </a-tooltip>
                 </tr-info-title>
                 <div v-html="infoModal.links[index].replaceAll(`\n`,`<br />`)" :style="{ borderRadius: '1rem', padding: '0.5rem' }" class="client-table-odd-row">
                 </div>
@@ -445,7 +481,7 @@
 </a-modal>
 <script>
   function refreshIPs(email) {
-    return HttpUtil.post(`/panel/inbound/clientIps/${email}`).then((msg) => {
+    return HttpUtil.post(`/panel/api/inbounds/clientIps/${email}`).then((msg) => {
       if (msg.success) {
         try {
           return JSON.parse(msg.obj).join(', ');
@@ -476,12 +512,21 @@
       this.dbInbound = new DBInbound(dbInbound);
       this.clientSettings = this.inbound.clients ? this.inbound.clients[index] : null;
       this.isExpired = this.inbound.clients ? this.inbound.isExpiry(index) : this.dbInbound.isExpiry;
-      this.clientStats = this.inbound.clients ? this.dbInbound.clientStats.find(row => row.email === this.clientSettings.email) : [];
+      this.clientStats = this.inbound.clients ? (this.dbInbound.clientStats.find(row => row.email === this.clientSettings.email) || null) : null;
 
-      if (app.ipLimitEnable && this.clientSettings.limitIp) {
-        refreshIPs(this.clientStats.email).then((ips) => {
-          this.clientIps = ips;
-        })
+      if (
+        [
+          Protocols.VMESS, 
+          Protocols.VLESS,
+          Protocols.TROJAN, 
+          Protocols.SHADOWSOCKS
+        ].includes(this.inbound.protocol)
+      ) {
+        if (app.ipLimitEnable && this.clientSettings.limitIp) {
+          refreshIPs(this.clientStats.email).then((ips) => {
+            this.clientIps = ips;
+          })
+        }
       }
       if (this.inbound.protocol == Protocols.WIREGUARD) {
         this.links = this.inbound.genInboundLinks(dbInbound.remark).split('\r\n')
@@ -491,7 +536,7 @@
       if (this.clientSettings) {
         if (this.clientSettings.subId) {
           this.subLink = this.genSubLink(this.clientSettings.subId);
-          this.subJsonLink = this.genSubJsonLink(this.clientSettings.subId);
+          this.subJsonLink = app.subSettings.subJsonEnable ? this.genSubJsonLink(this.clientSettings.subId) : '';
         }
       }
       this.visible = true;
@@ -530,6 +575,24 @@
         }
         return infoModal.dbInbound.isEnable;
       },
+      get isDepleted() {
+        const stats = infoModal.clientStats;
+        const settings = infoModal.clientSettings;
+        if (!stats || !settings) {
+          return false;
+        }
+        const total = stats.total ?? 0;
+        const used = (stats.up ?? 0) + (stats.down ?? 0);
+        const hasTotal = total > 0;
+        const exhausted = hasTotal && used >= total;
+
+        const expiryTime = settings.expiryTime ?? 0;
+        const hasExpiry = expiryTime > 0;
+        const now = Date.now();
+        const expired = hasExpiry && now >= expiryTime;
+
+        return expired || exhausted;
+      },
     },
     methods: {
       copy(content) {
@@ -557,7 +620,7 @@
           });
       },
       clearClientIps() {
-        HttpUtil.post(`/panel/inbound/clearClientIps/${this.infoModal.clientStats.email}`)
+        HttpUtil.post(`/panel/api/inbounds/clearClientIps/${this.infoModal.clientStats.email}`)
           .then((msg) => {
             if (!msg.success) {
               return;

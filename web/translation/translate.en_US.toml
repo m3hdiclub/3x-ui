@@ -50,6 +50,7 @@
 "fail" = "Failed"
 "comment" = "Comment"
 "success" = "Successfully"
+"lastOnline" = "Last Online"
 "getVersion" = "Get Version"
 "install" = "Install"
 "clients" = "Clients"
@@ -70,6 +71,20 @@
 "emptyBalancersDesc" = "No added balancers."
 "emptyReverseDesc" = "No added reverse proxies."
 "somethingWentWrong" = "Something went wrong"
+
+[subscription]
+"title" = "Subscription info"
+"subId" = "Subscription ID"
+"status" = "Status"
+"downloaded" = "Downloaded"
+"uploaded" = "Uploaded"
+"expiry" = "Expiry"
+"totalQuota" = "Total quota"
+"individualLinks" = "Individual links"
+"active" = "Active"
+"inactive" = "Inactive"
+"unlimited" = "Unlimited"
+"noExpiry" = "No expiry"
 
 [menu]
 "theme" = "Theme"
@@ -126,11 +141,14 @@
 "totalData" = "Total Data"
 "sent" = "Sent"
 "received" = "Received"
+"documentation" = "Documentation"
 "xraySwitchVersionDialog" = "Do you really want to change the Xray version?"
 "xraySwitchVersionDialogDesc" = "This will change the Xray version to #version#."
 "xraySwitchVersionPopover" = "Xray updated successfully"
 "geofileUpdateDialog" = "Do you really want to update the geofile?"
 "geofileUpdateDialogDesc" = "This will update the #filename# file."
+"geofilesUpdateDialogDesc" = "This will update all geofiles."
+"geofilesUpdateAll" = "Update all"
 "geofileUpdatePopover" = "Geofile updated successfully"
 "dontRefresh" = "Installation is in progress, please do not refresh this page"
 "logs" = "Logs"
@@ -148,6 +166,8 @@
 "getConfigError" = "An error occurred while retrieving the config file."
 
 [pages.inbounds]
+"allTimeTraffic" = "All-time Traffic"
+"allTimeTrafficUsage" = "All Time Total Usage"
 "title" = "Inbounds"
 "totalDownUp" = "Total Sent/Received"
 "totalUsage" = "Total Usage"
@@ -157,10 +177,13 @@
 "remark" = "Remark"
 "protocol" = "Protocol"
 "port" = "Port"
+"portMap" = "Port Mapping"
 "traffic" = "Traffic"
 "details" = "Details"
 "transportConfig" = "Transport"
 "expireDate" = "Duration"
+"createdAt" = "Created"
+"updatedAt" = "Updated"
 "resetTraffic" = "Reset Traffic"
 "addInbound" = "Add Inbound"
 "generalActions" = "General Actions"
@@ -221,6 +244,9 @@
 "exportInbound" = "Export Inbound"
 "import" = "Import"
 "importInbound" = "Import an Inbound"
+"periodicTrafficResetTitle" = "Traffic Reset"
+"periodicTrafficResetDesc" = "Automatically reset traffic counter at specified intervals"
+"lastReset" = "Last Reset"
 
 [pages.client]
 "add" = "Add Client"
@@ -240,6 +266,12 @@
 "renew" = "Auto Renew"
 "renewDesc" = "Auto-renewal after expiration. (0 = disable)(unit: day)"
 
+[pages.inbounds.periodicTrafficReset]
+"never" = "Never"
+"daily" = "Daily"
+"weekly" = "Weekly"
+"monthly" = "Monthly"
+
 [pages.inbounds.toasts]
 "obtain" = "Obtain"
 "updateSuccess" = "The update was successful."
@@ -257,7 +289,8 @@
 "resetInboundClientTrafficSuccess" = "Traffic has been reset."
 "trafficGetError" = "Error getting traffics."
 "getNewX25519CertError" = "Error while obtaining the X25519 certificate."
-
+"getNewmldsa65Error" = "Error while obtaining mldsa65."
+"getNewVlessEncError" = "Error while obtaining VlessEnc."
 
 [pages.inbounds.stream.general]
 "request" = "Request"
@@ -336,10 +369,11 @@
 "timeZone" = "Time Zone"
 "timeZoneDesc" = "Scheduled tasks will run based on this time zone."
 "subSettings" = "Subscription"
-"subEnable" = "Enable Subscription Service"
-"subEnableDesc" = "Enables the subscription service."
+"subEnable" = "Subscription Service"
+"subEnableDesc" = "Enable/Disable the subscription service."
+"subJsonEnable" = "Enable/Disable the JSON subscription endpoint independently."
 "subTitle" = "Subscription Title"
- "subTitleDesc" = "Title shown in VPN client"
+"subTitleDesc" = "Title shown in VPN client"
 "subListen" = "Listen IP"
 "subListenDesc" = "The IP address for the subscription service. (leave blank to listen on all IPs)"
 "subPort" = "Listen Port"
@@ -398,7 +432,6 @@
 "generalConfigsDesc" = "These options will determine general adjustments."
 "logConfigs" = "Log"
 "logConfigsDesc" = "Logs may affect your server's efficiency. It is recommended to enable it wisely only in case of your needs"
-"blockConfigs" = "Protection Shield"
 "blockConfigsDesc" = "These options will block traffic based on specific requested protocols and websites."
 "basicRouting" = "Basic Routing"
 "blockConnectionsConfigsDesc" = "These options will block traffic based on the specific requested country."
@@ -418,9 +451,6 @@
 "RoutingStrategy" = "Overall Routing Strategy"
 "RoutingStrategyDesc" = "Set the overall traffic routing strategy for resolving all requests."
 "Torrent" = "Block BitTorrent Protocol"
-"TorrentDesc" = "Blocks BitTorrent protocol."
-"Family" = "Family Protection"
-"FamilyDesc" = "Blocks adult content, and malware websites."
 "Inbounds" = "Inbounds"
 "InboundsDesc" = "Accepting the specific clients."
 "Outbounds" = "Outbounds"
@@ -520,6 +550,12 @@
 "edit" = "Edit Server"
 "domains" = "Domains"
 "expectIPs" = "Expect IPs"
+"unexpectIPs" = "Unexpect IPs"
+"useSystemHosts" = "Use System Hosts"
+"useSystemHostsDesc" = "Use the hosts file from an installed system"
+"usePreset" = "Use Preset"
+"dnsPresetTitle" = "DNS Presets"
+"dnsPresetFamily" = "Family"
 
 [pages.xray.fakedns]
 "add" = "Add Fake DNS"
@@ -538,6 +574,8 @@
 "twoFactorModalFirstStep" = "1. Scan this QR code in the app for authentication or copy the token near the QR code and paste it into the app"
 "twoFactorModalSecondStep" = "2. Enter the code from the app"
 "twoFactorModalRemoveStep" = "Enter the code from the application to remove two-factor authentication."
+"twoFactorModalChangeCredentialsTitle" = "Change credentials"
+"twoFactorModalChangeCredentialsStep" = "Enter the code from the application to change administrator credentials."
 "twoFactorModalSetSuccess" = "Two-factor authentication has been successfully established"
 "twoFactorModalDeleteSuccess" = "Two-factor authentication has been successfully deleted"
 "twoFactorModalError" = "Wrong code"
@@ -566,6 +604,7 @@
 "day" = "Day"
 "days" = "Days"
 "hours" = "Hours"
+"minutes" = "Minutes"
 "unknown" = "Unknown"
 "inbounds" = "Inbounds"
 "clients" = "Clients"
@@ -587,6 +626,10 @@
 "restartSuccess" = "✅ Operation successful!"
 "restartFailed" = "❗ Error in operation.\r\n\r\n<code>Error: {{ .Error }}</code>."
 "xrayNotRunning" = "❗ Xray Core is not running."
+"startDesc" = "Show the main menu"
+"helpDesc" = "Bot help"
+"statusDesc" = "Check bot status"
+"idDesc" = "Show your Telegram ID"
 
 [tgbot.messages]
 "cpuThreshold" = "🔴 CPU Load {{ .Percent }}% exceeds the threshold of {{ .Threshold }}%"
@@ -620,6 +663,7 @@
 "active" = "💡 Active: {{ .Enable }}\r\n"
 "enabled" = "🚨 Enabled: {{ .Enable }}\r\n"
 "online" = "🌐 Connection status: {{ .Status }}\r\n"
+"lastOnline" = "🔙 Last online: {{ .Time }}\r\n"
 "email" = "📧 Email: {{ .Email }}\r\n"
 "upload" = "🔼 Upload: ↑{{ .Upload }}\r\n"
 "download" = "🔽 Download: ↓{{ .Download }}\r\n"
@@ -634,7 +678,6 @@
 "refreshedOn" = "\r\n📋🔄 Refreshed On: {{ .Time }}\r\n\r\n"
 "yes" = "✅ Yes"
 "no" = "❌ No"
-
 "received_id" = "🔑📥 ID updated."
 "received_password" = "🔑📥 Password updated."
 "received_email" = "📧📥 Email updated."
@@ -646,14 +689,13 @@
 "inbound_client_data_id" = "🔄 Inbound: {{ .InboundRemark }}\n\n🔑 ID: {{ .ClientId }}\n📧 Email: {{ .ClientEmail }}\n📊 Traffic: {{ .ClientTraffic }}\n📅 Expire Date: {{ .ClientExp }}\n🌐 IP Limit: {{ .IpLimit }}\n💬 Comment: {{ .ClientComment }}\n\nYou can add the client to inbound now!"
 "inbound_client_data_pass" = "🔄 Inbound: {{ .InboundRemark }}\n\n🔑 Password: {{ .ClientPass }}\n📧 Email: {{ .ClientEmail }}\n📊 Traffic: {{ .ClientTraffic }}\n📅 Expire Date: {{ .ClientExp }}\n🌐 IP Limit: {{ .IpLimit }}\n💬 Comment: {{ .ClientComment }}\n\nYou can add the client to inbound now!"
 "cancel" = "❌ Process Canceled! \n\nYou can /start again anytime. 🔄"
-"error_add_client"  = "⚠️ Error:\n\n {{ .error }}"
-"using_default_value"  = "Okay, I'll stick with the default value. 😊"
-"incorrect_input" ="Your input is not valid.\nThe phrases should be continuous without spaces.\nCorrect example: aaaaaa\nIncorrect example: aaa aaa 🚫"
+"error_add_client" = "⚠️ Error:\n\n {{ .error }}"
+"using_default_value" = "Okay, I'll stick with the default value. 😊"
+"incorrect_input" = "Your input is not valid.\nThe phrases should be continuous without spaces.\nCorrect example: aaaaaa\nIncorrect example: aaa aaa 🚫"
 "AreYouSure" = "Are you sure? 🤔"
 "SuccessResetTraffic" = "📧 Email: {{ .ClientEmail }}\n🏁 Result: ✅ Success"
 "FailedResetTraffic" = "📧 Email: {{ .ClientEmail }}\n🏁 Result: ❌ Failed \n\n🛠️ Error: [ {{ .ErrorMessage }} ]"
 "FinishProcess" = "🔚 Traffic reset process finished for all clients."
-
 
 [tgbot.buttons]
 "closeKeyboard" = "❌ Close Keyboard"
@@ -688,7 +730,6 @@
 "limitTraffic" = "🚧 Traffic Limit"
 "getBanLogs" = "Get Ban Logs"
 "allClients" = "All Clients"
-
 "addClient" = "Add Client"
 "submitDisable" = "Submit As Disable ☑️"
 "submitEnable" = "Submit As Enable ✅"

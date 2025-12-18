@@ -6,17 +6,18 @@ import (
 	"fmt"
 	"strings"
 
-	"x-ui/database/model"
-	"x-ui/logger"
-	"x-ui/util/json_util"
-	"x-ui/util/random"
-	"x-ui/web/service"
-	"x-ui/xray"
+	"github.com/mhsanaei/3x-ui/v2/database/model"
+	"github.com/mhsanaei/3x-ui/v2/logger"
+	"github.com/mhsanaei/3x-ui/v2/util/json_util"
+	"github.com/mhsanaei/3x-ui/v2/util/random"
+	"github.com/mhsanaei/3x-ui/v2/web/service"
+	"github.com/mhsanaei/3x-ui/v2/xray"
 )
 
 //go:embed default.json
 var defaultJson string
 
+// SubJsonService handles JSON subscription configuration generation and management.
 type SubJsonService struct {
 	configJson       map[string]any
 	defaultOutbounds []json_util.RawMessage
@@ -28,6 +29,7 @@ type SubJsonService struct {
 	SubService     *SubService
 }
 
+// NewSubJsonService creates a new JSON subscription service with the given configuration.
 func NewSubJsonService(fragment string, noises string, mux string, rules string, subService *SubService) *SubJsonService {
 	var configJson map[string]any
 	var defaultOutbounds []json_util.RawMessage
@@ -67,6 +69,7 @@ func NewSubJsonService(fragment string, noises string, mux string, rules string,
 	}
 }
 
+// GetJson generates a JSON subscription configuration for the given subscription ID and host.
 func (s *SubJsonService) GetJson(subId string, host string) (string, string, error) {
 	inbounds, err := s.SubService.getInboundsBySubId(subId)
 	if err != nil || len(inbounds) == 0 {
@@ -171,12 +174,12 @@ func (s *SubJsonService) getConfig(inbound *model.Inbound, client model.Client, 
 		case "tls":
 			if newStream["security"] != "tls" {
 				newStream["security"] = "tls"
-				newStream["tslSettings"] = map[string]any{}
+				newStream["tlsSettings"] = map[string]any{}
 			}
 		case "none":
 			if newStream["security"] != "none" {
 				newStream["security"] = "none"
-				delete(newStream, "tslSettings")
+				delete(newStream, "tlsSettings")
 			}
 		}
 		streamSettings, _ := json.MarshalIndent(newStream, "", "  ")
@@ -184,8 +187,10 @@ func (s *SubJsonService) getConfig(inbound *model.Inbound, client model.Client, 
 		var newOutbounds []json_util.RawMessage
 
 		switch inbound.Protocol {
-		case "vmess", "vless":
+		case "vmess":
 			newOutbounds = append(newOutbounds, s.genVnext(inbound, streamSettings, client))
+		case "vless":
+			newOutbounds = append(newOutbounds, s.genVless(inbound, streamSettings, client))
 		case "trojan", "shadowsocks":
 			newOutbounds = append(newOutbounds, s.genServer(inbound, streamSettings, client))
 		}
@@ -209,9 +214,10 @@ func (s *SubJsonService) streamData(stream string) map[string]any {
 	var streamSettings map[string]any
 	json.Unmarshal([]byte(stream), &streamSettings)
 	security, _ := streamSettings["security"].(string)
-	if security == "tls" {
+	switch security {
+	case "tls":
 		streamSettings["tlsSettings"] = s.tlsData(streamSettings["tlsSettings"].(map[string]any))
-	} else if security == "reality" {
+	case "reality":
 		streamSettings["realitySettings"] = s.realityData(streamSettings["realitySettings"].(map[string]any))
 	}
 	delete(streamSettings, "sockopt")
@@ -263,6 +269,7 @@ func (s *SubJsonService) realityData(rData map[string]any) map[string]any {
 	rltyData["show"] = false
 	rltyData["publicKey"] = rltyClientSettings["publicKey"]
 	rltyData["fingerprint"] = rltyClientSettings["fingerprint"]
+	rltyData["mldsa65Verify"] = rltyClientSettings["mldsa65Verify"]
 
 	// Set random data
 	rltyData["spiderX"] = "/" + random.Seq(15)
@@ -287,15 +294,8 @@ func (s *SubJsonService) genVnext(inbound *model.Inbound, streamSettings json_ut
 	usersData := make([]UserVnext, 1)
 
 	usersData[0].ID = client.ID
-	usersData[0].Level = 8
-	if inbound.Protocol == model.VMESS {
-		usersData[0].Security = client.Security
-	}
-	if inbound.Protocol == model.VLESS {
-		usersData[0].Flow = client.Flow
-		usersData[0].Encryption = "none"
-	}
-
+	usersData[0].Email = client.Email
+	usersData[0].Security = client.Security
 	vnextData := make([]VnextSetting, 1)
 	vnextData[0] = VnextSetting{
 		Address: inbound.Listen,
@@ -309,10 +309,38 @@ func (s *SubJsonService) genVnext(inbound *model.Inbound, streamSettings json_ut
 		outbound.Mux = json_util.RawMessage(s.mux)
 	}
 	outbound.StreamSettings = streamSettings
-	outbound.Settings = OutboundSettings{
-		Vnext: vnextData,
+	outbound.Settings = map[string]any{
+		"vnext": vnextData,
 	}
 
+	result, _ := json.MarshalIndent(outbound, "", "  ")
+	return result
+}
+
+func (s *SubJsonService) genVless(inbound *model.Inbound, streamSettings json_util.RawMessage, client model.Client) json_util.RawMessage {
+	outbound := Outbound{}
+	outbound.Protocol = string(inbound.Protocol)
+	outbound.Tag = "proxy"
+	if s.mux != "" {
+		outbound.Mux = json_util.RawMessage(s.mux)
+	}
+	outbound.StreamSettings = streamSettings
+	settings := make(map[string]any)
+	settings["address"] = inbound.Listen
+	settings["port"] = inbound.Port
+	settings["id"] = client.ID
+	if client.Flow != "" {
+		settings["flow"] = client.Flow
+	}
+
+	// Add encryption for VLESS outbound from inbound settings
+	var inboundSettings map[string]any
+	json.Unmarshal([]byte(inbound.Settings), &inboundSettings)
+	if encryption, ok := inboundSettings["encryption"].(string); ok {
+		settings["encryption"] = encryption
+	}
+
+	outbound.Settings = settings
 	result, _ := json.MarshalIndent(outbound, "", "  ")
 	return result
 }
@@ -348,8 +376,8 @@ func (s *SubJsonService) genServer(inbound *model.Inbound, streamSettings json_u
 		outbound.Mux = json_util.RawMessage(s.mux)
 	}
 	outbound.StreamSettings = streamSettings
-	outbound.Settings = OutboundSettings{
-		Servers: serverData,
+	outbound.Settings = map[string]any{
+		"servers": serverData,
 	}
 
 	result, _ := json.MarshalIndent(outbound, "", "  ")
@@ -361,13 +389,7 @@ type Outbound struct {
 	Tag            string               `json:"tag"`
 	StreamSettings json_util.RawMessage `json:"streamSettings"`
 	Mux            json_util.RawMessage `json:"mux,omitempty"`
-	ProxySettings  map[string]any       `json:"proxySettings,omitempty"`
-	Settings       OutboundSettings     `json:"settings,omitempty"`
-}
-
-type OutboundSettings struct {
-	Vnext   []VnextSetting  `json:"vnext,omitempty"`
-	Servers []ServerSetting `json:"servers,omitempty"`
+	Settings       map[string]any       `json:"settings,omitempty"`
 }
 
 type VnextSetting struct {
@@ -377,11 +399,9 @@ type VnextSetting struct {
 }
 
 type UserVnext struct {
-	Encryption string `json:"encryption,omitempty"`
-	Flow       string `json:"flow,omitempty"`
-	ID         string `json:"id"`
-	Security   string `json:"security,omitempty"`
-	Level      int    `json:"level"`
+	ID       string `json:"id"`
+	Email    string `json:"email,omitempty"`
+	Security string `json:"security,omitempty"`
 }
 
 type ServerSetting struct {
